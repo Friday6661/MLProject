@@ -1,0 +1,18 @@
+{
+    "database": {
+        "raw_data": {
+            "driver": "ODBC Driver 18 for SQL Server",
+            "server": "localhost",
+            "database": "RAW_DATA",
+            "uid": "sa",
+            "pwd": "1qaz2wsx"
+        },
+        "clean_data": {
+            "driver": "ODBC Driver 18 for SQL Server",
+            "server": "localhost",
+            "database": "CLEAN_DATA",
+            "uid": "sa",
+            "pwd": "1qaz2wsx"
+        }
+    }
+}
