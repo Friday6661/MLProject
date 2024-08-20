@@ -5,8 +5,12 @@ class MonthlySalesClean(Base1):
     __tablename__ = 'T_MONTHLYSALESCLEAN'
 
     id = Column(Integer, primary_key=True, index=True)
-    model = Column(String)
-    serial_number = Column(String)
-    longitude_location = Column(DECIMAL(10, 5))
-    latitude_location = Column(DECIMAL(10, 5))
-    date = Column(Date)
+    date = Column(Date, nullable=False)
+    model = Column(String(50), nullable=False)
+    serial_number = Column(String(50), nullable=False, unique=True)
+    quantity_sold = Column(Integer, nullable=False)
+    price_per_unit = Column(DECIMAL(12, 2), nullable=False)
+    total_sales = Column(DECIMAL(15, 2), nullable=False)
+    sales_region = Column(String(100), nullable=True)
+    salesperson = Column(String(100), nullable=True)
+    notes = Column(String(255), nullable=True)

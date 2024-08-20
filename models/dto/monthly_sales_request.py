@@ -1,15 +1,18 @@
-# models/dto/komtrax_request.py
-from pydantic import BaseModel
 from decimal import Decimal
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date
 
 class MonthlySalesRequest(BaseModel):
+    date: date
     model: str
     serial_number: str
-    longitude_location: Decimal
-    latitude_location: Decimal
-    date: date
+    quantity_sold: int
+    price_per_unit: Decimal
+    total_sales: Decimal
+    sales_region: Optional[str] = None
+    salesperson: Optional[str] = None
+    notes: Optional[str] = None
 
     class Config:
         orm_mode = True

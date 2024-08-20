@@ -1,0 +1,59 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Environment
+.env
+.venv
+venv/
+env/
+ENV/
+*.env
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs_analysis.dat
+*.njsproj
+*.sln
+
+# Pytest
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# MyPy
+.mypy_cache/
+
+# SQLAlchemy
+*.db
+*.sqlite
+
+# FastAPI specific
+*.log
+
+# Docker
+docker-compose.override.yml
+Dockerfile
+docker-compose.yml
+
+# System Files
+.DS_Store
+*.swp
+*.swo
+
+# Other
+*.egg
+*.egg-info/
+dist/
+build/
+*.gz
+*.zip
+controllers/__pycache__/
+controllers/__pycache__/
+envproject/Lib/site-packages/

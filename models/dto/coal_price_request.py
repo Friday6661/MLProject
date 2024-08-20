@@ -1,10 +1,16 @@
-# models/dto/komtrax_request.py
-from pydantic import BaseModel
+from datetime import date
 from decimal import Decimal
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class CoalPriceRequest(BaseModel):
-    daily_coal_price: Decimal
+    date: date
+    price_per_ton: Decimal
+    currency: str
+    location: Optional[str] = None
+    grade: Optional[str] = None
+    supplier: Optional[str] = None
+    notes: Optional[str] = None
 
     class Config:
         orm_mode = True
