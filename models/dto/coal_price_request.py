@@ -13,6 +13,6 @@ class CoalPriceRequest(BaseModel):
     notes: Optional[str] = None
 
     class Config:
-        orm_mode = True
-        anystr_strip_whitespace = True
-        min_anystr_length = 1
+        from_attributes = True
+        str_strip_whitespace = True
+        str_min_length = 1

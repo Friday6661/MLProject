@@ -1,3 +1,8 @@
+from datetime import date
+from io import BytesIO
+from typing import Any, Dict, List, Optional, Union
+
+from fastapi import HTTPException
 from models.monthly_sales_model import MonthlySales
 from repositories.monthly_sales_repository import MonthlySalesRepository
 from repositories.monthly_sales_clean_repository import MonthlySalesCleanRepository
@@ -5,10 +10,13 @@ from models.dto.monthly_sales_request import MonthlySalesRequest
 from sqlalchemy.orm import Session
 import pandas as pd
 
+from services.general_parshing_services import GeneralParshing
+
 class MonthlySalesService:
     def __init__(self, db: Session):
         self.repo = MonthlySalesRepository(db)
         self.repo_clean = MonthlySalesCleanRepository(db)
+        self.parshing_service = GeneralParshing()
 
     def read_all_monthly_sales_service(self):
         return self.repo.get_all()
@@ -18,11 +26,16 @@ class MonthlySalesService:
 
     def create_monthly_sales_service(self, monthly_sales_request: MonthlySalesRequest):
         monthly_sales = MonthlySales(
+            customer_name = monthly_sales_request.customer_name,
+            sec = monthly_sales_request.sec,
+            gr = monthly_sales_request.gr,
             model = monthly_sales_request.model,
-            serial_number = monthly_sales_request.serial_number,
-            longitude_location = monthly_sales_request.longitude_location,
-            latitude_location = monthly_sales_request.latitude_location,
-            date = monthly_sales_request.date
+            model_spec = monthly_sales_request.model_specification,
+            sn = monthly_sales_request.sn,
+            loc = monthly_sales_request.loc,
+            billing = monthly_sales_request.billing,
+            sm_b = monthly_sales_request.sm_b,
+            gov_soe = monthly_sales_request.gov_soe
         )
         return self.repo.create(monthly_sales)
 
@@ -38,23 +51,40 @@ class MonthlySalesService:
         if monthly_sales is None:
             return None
         monthly_sales.model = monthly_sales_request.model
-        monthly_sales.serial_number = monthly_sales_request.serial_number
-        monthly_sales.longitude_location = monthly_sales_request.longitude_location
-        monthly_sales.latitude_location = monthly_sales_request.latitude_location
-        monthly_sales.date = monthly_sales_request.latitude_location
+        monthly_sales.model_spec = monthly_sales_request.model_specification
+        monthly_sales.sn = monthly_sales_request.sn
+        monthly_sales.loc = monthly_sales_request.loc
+        monthly_sales.billing = monthly_sales_request.billing
+        monthly_sales.sm_b = monthly_sales_request.sm_b
+        monthly_sales.gov_soe = monthly_sales_request.gov_soe
         return self.repo.update(monthly_sales)
     
-    def clean_raw_data_from_duplicate(self):
-        all_sales = self.repo.get_all()
-        df = pd.DataFrame([sale.__dict__ for sale in all_sales])
-
-        df = df.drop_duplicates(subset=['model', 'serial_number'], keep='first')
-        for _, row in df.iterrows():
-            new_record = MonthlySalesRequest(
-                model= row['model'],
-                serial_number=row['serial_number'],
-                longitude_location=row['longitude_location'],
-                latitude_location=row['latitude_location'],
-                date=row['date']
+    def parse_and_create_monthly_sales(self, file_stream: BytesIO):
+        service_name = "monthlySalesFile"
+        parsed_data = self.parshing_service.parse_file(file_stream, service_name)
+        for data in parsed_data:
+            monthly_sales_request = MonthlySalesRequest(
+                customer_name=data["customerNameColumn"] or "",
+                sec=data["secColumn"] or "",
+                gr=self.convert_to_date(data.get("grColumn")),
+                model=data["modelColumn"] or "",
+                model_specification=data["modelSpecificationColumn"] or "",
+                sn=data["snColumn"] or "",
+                loc=data["locColumn"] or "",
+                billing=self.convert_to_date(data.get("billingColumn")),
+                sm_b=data["sm_bColumn"] or "",
+                gov_soe=data["gov_soeColumn"] or "",
             )
-            self.repo_clean.create(new_record)
+            self.create_monthly_sales_service(monthly_sales_request)
+    
+    def convert_to_date(self, value: Optional[Union[str, int]]) -> Optional[date]:
+        if isinstance(value, int):
+            return date.min
+        
+        if value:
+            try:
+                return pd.to_datetime(value).date()
+            except Exception:
+                return date.min
+        
+        return date.min

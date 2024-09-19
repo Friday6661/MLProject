@@ -14,5 +14,16 @@
             "uid": "sa",
             "pwd": "1qaz2wsx"
         }
+    },
+    "jwt_settings": {
+        "secret_key": "jfdsbhjasdbfu382438434782370.p[[.p.p[.p[.;'.",
+        "algorithm": "HS256",
+        "access_token_expire_minutes": 120
+    },
+    "ess_user_configs": {
+        "url": "http://localhost:53376/Api/ApiAccount/Login_External",
+        "device_id": "JARANGOYANG",
+        "role_admin": "140022, 150033",
+        "role_manager": "110083, 220054"
     }
 }

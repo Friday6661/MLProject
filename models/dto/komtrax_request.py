@@ -1,17 +1,20 @@
+from datetime import date
 from decimal import Decimal
 from pydantic import BaseModel
 from typing import Optional
 
 class KomtraxRequest(BaseModel):
-    model: str
-    serial_number: str
-    smr: Decimal
-    working_hour: Decimal
-    actual_working_hour: Decimal
-    longitude_location: Decimal
-    latitude_location: Decimal
+    year: Optional[int]
+    month: Optional[int]
+    model: Optional[str]
+    type: Optional[str]
+    serial_number: Optional[str]
+    customer_name: Optional[str]
+    current_smr: Optional[Decimal]
+    current_smr_time: Optional[date]
+    sum_monthly_working_hours: Optional[Decimal]
+    sum_monthly_working_days: Optional[int]
 
     class Config:
-        orm_mode = True
-        anystr_strip_whitespace = True
-        min_anystr_length = 1
+        from_attributes = True
+        str_strip_whitespace = True

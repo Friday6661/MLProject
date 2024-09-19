@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Jamaludin\MLProject\envproject
+set VIRTUAL_ENV=D:\Jamaludin\MLProject\envproject
 
 if not defined PROMPT set PROMPT=$P$G
 

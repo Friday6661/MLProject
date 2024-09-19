@@ -1,0 +1,253 @@
+{
+    "fileUploadConfig": {
+      "komtraxFile": {
+        "allowedFileType": [".xls", ".xlsx"],
+        "sheetName": "REPORT",
+        "rowHeaderTableKey": "Year",
+        "parshingFileSettings": {
+          "yearColumn": {
+            "dbColumnName": "year",
+            "possibleFileColumnName": ["Year"],
+            "possibleTypeValueFile": ["int", "str"],
+            "typeValueDb": "int",
+            "possibleNullColumnDb": true
+          },
+          "monthColumn": {
+            "dbColumnName": "month",
+            "possibleFileColumnName": ["Month"],
+            "possibleTypeValueFile": ["int", "str"],
+            "typeValueDb": "int",
+            "possibleNullColumnDb": true
+          },
+          "modelColumn": {
+            "dbColumnName": "model",
+            "possibleFileColumnName": ["Model", "Machine Model"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "typeColumn": {
+            "dbColumnName": "type",
+            "possibleFileColumnName": ["Type", "Machine Type"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "serialNumberColumn": {
+            "dbColumnName": "serial_number",
+            "possibleFileColumnName": ["Serial No."],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "customerNameColumn": {
+            "dbColumnName": "customer_name",
+            "possibleFileColumnName": ["Customer"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "currentSMRColumn": {
+            "dbColumnName": "current_smr",
+            "possibleFileColumnName": ["Current SMR"],
+            "possibleTypeValueFile": ["float"],
+            "typeValueDb": "decimal",
+            "possibleNullColumnDb": true
+          },
+          "currentSMRTimeColumn": {
+            "dbColumnName": "current_smr_time",
+            "possibleFileColumnName": ["Current SMR time"],
+            "possibleTypeValueFile": ["datetime"],
+            "typeValueDb": "date",
+            "possibleNullColumnDb": true
+          },
+          "sumMonthlyWorkingHoursColumn": {
+            "dbColumnName": "sum_monthly_working_hours",
+            "possibleFileColumnName": ["Sum_ Monthly Working Hours(Past 12 Months Moving Avg)"],
+            "possibleTypeValueFile": ["float"],
+            "typeValueDb": "decimal",
+            "possibleNullColumnDb": true
+          },
+          "sumMonthlyWorkingDaysColumn": {
+            "dbColumnName": "sum_monthly_working_hours",
+            "possibleFileColumnName": ["Sum_ Monthly Working Days"],
+            "possibleTypeValueFile": ["float"],
+            "typeValueDb": "int",
+            "possibleNullColumnDb": true
+          }
+        }
+      },
+      "monthlySalesFile": {
+        "allowedFileType": [".xls", ".xlsx"],
+        "sheetName": "SALES",
+        "rowHeaderTableKey": "Customer Name",
+        "parshingFileSettings": {
+          "customerNameColumn": {
+            "dbColumnName": "customer_name",
+            "possibleFileColumnName": ["Customer Name"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "secColumn": {
+            "dbColumnName": "sec",
+            "possibleFileColumnName": ["Sector", "Sec"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "grColumn": {
+            "dbColumnName": "gr",
+            "possibleFileColumnName": ["GR"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "date",
+            "possibleNullColumnDb": true
+          },
+          "modelColumn": {
+            "dbColumnName": "model",
+            "possibleFileColumnName": ["Model"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "modelSpecificationColumn": {
+            "dbColumnName": "model_spec",
+            "possibleFileColumnName": ["Model/Spec"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "snColumn": {
+            "dbColumnName": "sn",
+            "possibleFileColumnName": ["SN"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "locColumn": {
+            "dbColumnName": "loc",
+            "possibleFileColumnName": ["Loc"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "billingColumn": {
+            "dbColumnName": "billing",
+            "possibleFileColumnName": ["Billing"],
+            "possibleTypeValueFile": ["date"],
+            "typeValueDb": "date",
+            "possibleNullColumnDb": true
+          },
+          "sm_bColumn": {
+            "dbColumnName": "sm_b",
+            "possibleFileColumnName": ["s-m/B"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "gov_soeColumn": {
+            "dbColumnName": "gov_soe",
+            "possibleFileColumnName": ["SOE/GOV"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          }
+        }
+      },
+      "monthlyStockFile": {
+        "allowedFileType": [".xls", ".xlsx"],
+        "sheetName": "STOCK",
+        "rowHeaderTableKey": "GR",
+        "parshingFileSettings": {
+          "grColumn": {
+            "dbColumnName": "gr",
+            "possibleFileColumnName": ["GR"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "date",
+            "possibleNullColumnDb": true 
+          },
+          "modelColumn": {
+            "dbColumnName": "model",
+            "possibleFileColumnName": ["Model"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "modelSpecificationColumn": {
+            "dbColumnName": "model_spec",
+            "possibleFileColumnName": ["Model/Spec"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "snColumn": {
+            "dbColumnName": "sn",
+            "possibleFileColumnName": ["SN"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "statColumn": {
+            "dbColumnName": "stat",
+            "possibleFileColumnName": ["Stat"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "locColumn": {
+            "dbColumnName": "loc",
+            "possibleFileColumnName": ["Loc"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          },
+          "agingColumn": {
+            "dbColumnName": "aging",
+            "possibleFileColumnName": ["Aging"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "int",
+            "possibleNullColumnDb": true
+          },
+          "sm_bColumn": {
+            "dbColumnName": "sm_b",
+            "possibleFileColumnName": ["s-m/B"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str",
+            "possibleNullColumnDb": true
+          }
+        }
+      },
+      "weeklyCoalPriceFile": {
+        "allowedFileType": [".xls", ".xlsx"],
+        "sheetName": "Weekly",
+        "rowHeaderTableKey": "date",
+        "parshingFileSettings": {
+          "dateColumn": {
+            "dbColumnName": "date",
+            "possibleFileColumnName": ["date"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "date"
+          },
+          "tradeRegionAndSpecificationsColumn": {
+            "dbColumnName": "trade_region_and_specification",
+            "possibleFileColumnName": ["trade regions"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str"
+          },
+          "tradeTermsColumn": {
+            "dbColumnName": "trade_terms",
+            "possibleFileColumnName": ["trade terms"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "str"
+          },
+          "priceColumn": {
+            "dbColumnName": "price",
+            "possibleFileColumnName": ["price"],
+            "possibleTypeValueFile": ["object"],
+            "typeValueDb": "decimal"
+          }
+        }
+      }
+    }
+  }
+  

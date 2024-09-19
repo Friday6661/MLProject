@@ -4,15 +4,19 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import URL
+from helper.json_helper import JsonHelper
 
 
 # fungsi untuk membaca konfigurasi dari config.json
-def load_config():
-    with open('config.json', 'r') as file:
-        return json.load(file)
+# def load_config():
+#     with open('config.json', 'r') as file:
+#         return json.load(file)
+
+
 
 # memuat konfigurasi dari file JSON
-config = load_config()
+json_helper = JsonHelper()
+config = json_helper.load_config('config.json', 'r')
 
 def get_connection_string(database_config_name):
     db_config = config['database'][database_config_name]

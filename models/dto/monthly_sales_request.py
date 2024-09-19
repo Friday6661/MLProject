@@ -4,17 +4,17 @@ from typing import Optional
 from datetime import date
 
 class MonthlySalesRequest(BaseModel):
-    date: date
-    model: str
-    serial_number: str
-    quantity_sold: int
-    price_per_unit: Decimal
-    total_sales: Decimal
-    sales_region: Optional[str] = None
-    salesperson: Optional[str] = None
-    notes: Optional[str] = None
+    customer_name: Optional[str]
+    sec: Optional[str]
+    gr: Optional[date]
+    model: Optional[str]
+    model_specification: Optional[str]
+    sn: Optional[str]
+    loc: Optional[str]
+    billing: Optional[date]
+    sm_b: Optional[str]
+    gov_soe: Optional[str]
 
     class Config:
-        orm_mode = True
-        anystr_strip_whitespace = True
-        min_anystr_length = 1
+        from_attributes = True
+        str_strip_whitespace = True

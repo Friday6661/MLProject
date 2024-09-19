@@ -1,16 +1,17 @@
 from database import Base
-from sqlalchemy import Column, String, Integer, DECIMAL, Date
+from sqlalchemy import Column, String, Integer, DATE
 
 class MonthlySales(Base):
-    __tablename__ = 'T_MONTHLYSALES'
+    __tablename__ = 'M_MONTHLYSALES'
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False)
-    model = Column(String(50), nullable=False)
-    serial_number = Column(String(50), nullable=False, unique=True)
-    quantity_sold = Column(Integer, nullable=False)
-    price_per_unit = Column(DECIMAL(12, 2), nullable=False)
-    total_sales = Column(DECIMAL(15, 2), nullable=False)
-    sales_region = Column(String(100), nullable=True)
-    salesperson = Column(String(100), nullable=True)
-    notes = Column(String(255), nullable=True)
+    customer_name = Column(String, nullable=True)
+    sec = Column(String, nullable=True)
+    gr = Column(DATE, nullable=True)
+    model = Column(String, nullable=True)
+    model_spec = Column(String, nullable=True)
+    sn = Column(String, nullable=True)
+    loc = Column(String, nullable=True)
+    billing = Column(DATE, nullable=True)
+    sm_b = Column(String, nullable=True)
+    gov_soe = Column(String, nullable=True)
