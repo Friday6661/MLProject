@@ -3,6 +3,7 @@ import json
 from typing import Any, Dict, List, Optional, Type
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
+import numpy as np
 import pandas as pd
 from difflib import SequenceMatcher
 
@@ -94,14 +95,59 @@ class GeneralParshing:
 
         return column_data_types
     
+    # def trim_dataframe(self, df: pd.DataFrame, service_name: str) -> pd.DataFrame:
+    #     # Ambil konfigurasi kolom dan tipe data dari configFile.json
+    #     config_columns = self.config[service_name]["parshingFileSettings"]
+    #     config_columns_length = len(config_columns)  # Menghitung jumlah kolom dalam config
+        
+    #     # Potong x kolom pertama dari DataFrame
+    #     trimmed_df = df.iloc[:, :config_columns_length]
+        
+    #     return trimmed_df
+
     def trim_dataframe(self, df: pd.DataFrame, service_name: str) -> pd.DataFrame:
-        # Ambil konfigurasi kolom dan tipe data dari configFile.json
+        # Ambil konfigurasi kolom dari configFile.json
         config_columns = self.config[service_name]["parshingFileSettings"]
-        config_columns_length = len(config_columns)  # Menghitung jumlah kolom dalam config
-        
-        # Potong x kolom pertama dari DataFrame
-        trimmed_df = df.iloc[:, :config_columns_length]
-        
+
+        # Dapatkan semua possibleFileColumnName
+        possible_file_columns = []
+        for column_name, attributes in config_columns.items():
+            possible_file_columns.extend(attributes['possibleFileColumnName'])
+
+        # Dapatkan posisi kolom yang sesuai di DataFrame
+        matched_columns = []
+        for col in possible_file_columns:
+            if col in df.columns:
+                matched_columns.append(col)
+
+        # Dapatkan indeks kolom dari DataFrame
+        # indices = [df.columns.get_loc(col) for col in matched_columns]
+        indices = []
+        for col in matched_columns:
+            try:
+                index = df.columns.get_loc(col)
+                min_index = []  # List untuk menyimpan indeks yang bernilai True
+                if isinstance(index, np.ndarray) and index.dtype == np.bool_:
+                    for i, value in enumerate(index):  # Menggunakan enumerate untuk mendapatkan indeks
+                        if value:  # Jika nilai True
+                            min_index.append(i)  # Tambahkan indeks i ke dalam min_index
+                    if len(min_index) > 0:  # Jika ada elemen dalam min_index
+                        indices.append(min_index[0])  # Ambil yang pertama
+                else:
+                    indices.append(index)  # Tambahkan indeks biasa
+            except KeyError:
+                continue
+
+        print("Matched Columns:", matched_columns)
+        print("Indices:", indices)
+        # Ambil dari indeks y min sampai y max
+        if indices:
+            y_min = min(indices)
+            y_max = max(indices) + 1  # Untuk menyertakan kolom terakhir
+            trimmed_df = df.iloc[:, y_min:y_max]
+        else:
+            trimmed_df = pd.DataFrame()  # Jika tidak ada kolom yang cocok, kembalikan DataFrame kosong
+
         return trimmed_df
 
     def convert_value_type(self, value: Any, column_name: str, service_name) -> Any:
@@ -152,7 +198,7 @@ class GeneralParshing:
         row_header_table_key = self.config[service_name]["rowHeaderTableKey"]
         return row_header_table_key
         
-    def parse_file(self, file_stream: BytesIO, service_name: str) -> list:
+    def  parse_file(self, file_stream: BytesIO, service_name: str) -> list:
         # Reset stream ke awal
         file_stream.seek(0)
         
@@ -163,6 +209,7 @@ class GeneralParshing:
         table_header = self.find_table_header(df, service_name, header_row_index)
 
         df.columns = df.iloc[header_row_index]
+        columns = df.columns
         df = df[header_row_index + 1:]
         df = df.reset_index(drop=True)
         df = self.trim_dataframe(df, service_name)

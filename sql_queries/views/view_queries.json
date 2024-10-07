@@ -1,0 +1,25 @@
+{
+    "views": {
+        "v_monthly_sales": {
+            "query": "CREATE OR ALTER VIEW V_MONTHLYSALES AS SELECT FORMAT(billing, 'yyyy-MM') AS month, COUNT(*) AS total_sales FROM M_MONTHLYSALES WHERE billing IS NOT NULL GROUP BY FORMAT(billing, 'yyyy-MM')"
+        },
+        "v_indonesia_coal_price": {
+            "query": "CREATE OR ALTER VIEW V_MONTHLYINDONESIANCOALPRICE AS SELECT FORMAT(date, 'yyyy-MM') AS month, trade_region_and_specification AS quality, trade_terms, price FROM M_MONTHLYCOALPRICE WHERE trade_region_and_specification LIKE '%Indonesia%'"
+        },
+        "v_komtrax_summary": {
+            "query": "CREATE OR ALTER VIEW V_KOMTRAXSUMMARY AS SELECT year, month, model, COUNT(current_smr) AS count_current_smr, SUM(sum_monthly_working_hours) AS count_sum_monthly_working_hours, SUM(sum_monthly_working_days) AS count_sum_monthly_working_days FROM M_KOMTRAX GROUP BY year, month, model"
+        },
+        "v_monthly_sales_model": {
+            "query": "CREATE OR ALTER VIEW V_MONTHLYSALESMODEL AS SELECT FORMAT(billing, 'yyyy-MM') AS [month], model, COUNT(*) AS total_sales FROM M_MONTHLYSALES GROUP BY FORMAT(billing, 'yyyy-MM'), model, customer_name"
+        },
+        "v_monthly_stocks_model": {
+            "query": "CREATE OR ALTER VIEW V_MONTHLYSTOCKSMODEL AS SELECT CONCAT(year, '-', RIGHT('0' + CAST(month AS VARCHAR(2)), 2)) AS month_year, model, COUNT(*) AS total_stocks FROM M_MONTHLYSTOCKS GROUP BY year, month, model"
+        },
+        "v_monthly_stocks": {
+            "query": "CREATE OR ALTER VIEW V_MONTHLYSTOCKS AS SELECT CAST(year AS VARCHAR(4)) + '-' + RIGHT('0' + CAST(month AS VARCHAR(2)), 2) AS month, COUNT(*) AS total_stocks FROM M_MONTHLYSTOCKS GROUP BY year, month"
+        },
+        "v_monthly_coal_price_m38": {
+            "query": "CREATE OR ALTER VIEW V_MONTHLYCOALPRICE_M38 AS SELECT date, SUM(price) AS coal_price FROM M_MONTHLYCOALPRICE WHERE trade_region_and_specification = 'M38 Indonesia(3,800 kc GAR)' GROUP BY date"
+        }
+    }
+}

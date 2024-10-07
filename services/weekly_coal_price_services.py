@@ -34,17 +34,24 @@ class WeeklyCoalPriceService:
         )
         return self.repo.create(weekly_coal_price)
     
+    def bulk_create_weekly_coal_price(self, list_weekly_coal_price_request: list[WeeklyCoalPriceRequest]):
+        weekly_coal_prices = [
+            WeeklyCoalPrice(
+                date=request.date,
+                trade_region_and_specification=request.trade_region_and_specification,
+                trade_terms=request.trade_terms,
+                price=request.price
+            )
+            for request in list_weekly_coal_price_request
+        ]
+        return self.repo.bulk_create(weekly_coal_prices)
+    
     def delete_weekly_coal_price(self, weekly_coal_price_id: int):
         weekly_coal_price = self.repo.get_by_id(weekly_coal_price_id)
-        if weekly_coal_price is None:
-            return None
-        self.repo.delete(weekly_coal_price)
-        return weekly_coal_price
+        return self.repo.delete(weekly_coal_price)
     
     def update_weekly_coal_price(self, weekly_coal_price_id: int, weekly_coal_price_request: WeeklyCoalPriceRequest):
         weekly_coal_price = self.repo.get_by_id(weekly_coal_price_id)
-        if weekly_coal_price is None:
-            return None
         weekly_coal_price.date = weekly_coal_price_request.date
         weekly_coal_price.trade_region_and_specification = weekly_coal_price_request.trade_region_and_specification
         weekly_coal_price.trade_terms = weekly_coal_price_request.trade_terms
@@ -60,7 +67,7 @@ class WeeklyCoalPriceService:
         
         return file_stream 
     
-    def change_file_input_struckture(self, service_name: str, file_stream: BytesIO):
+    def change_file_input_structure(self, service_name: str, file_stream: BytesIO):
         sheet_name = self.parshing_service.find_sheet_name(file_stream, service_name)
         df = self.parshing_service.load_excel_to_dataframe(file_stream, sheet_name)
         key_header = "(US dollars per metric ton)"
@@ -106,12 +113,33 @@ class WeeklyCoalPriceService:
         df_joined = pd.DataFrame(join_data)
 
         return self.dataframe_to_excel_stream(df_joined, sheet_name)
+    
+    def find_table_header_row_index(self, df: pd.DataFrame, key_header: str) -> int:
+        header_key = key_header.lower()
+        if not header_key:
+            raise ValueError("Table Header tidak ditemukan")
+        
+        def is_similar(s1, s2, threshold=0.8):
+            return SequenceMatcher(None, s1, s2).ratio() >= threshold
+        
+        for index, row in df.iterrows():
+            for item in row.values:
+                if pd.isna(item):
+                    continue
+                
+                # Normalisasi item
+                normalize_item = str(item).lower().strip()
+                if is_similar(normalize_item, header_key):
+                    return index
+        
+        raise ValueError(f"Header dengan key '{header_key}' tidak ditemukan dalam file.")
 
     def parse_and_create_weekly_coal_price(self, file_stream: BytesIO):
         try:
             service_name = "weeklyCoalPriceFile"
-            new_file_stream = self.change_file_input_struckture(service_name, file_stream)
+            new_file_stream = self.change_file_input_structure(service_name, file_stream)
             parsed_data = self.parshing_service.parse_file(new_file_stream, service_name)
+            weekly_coal_price_requests = []
             for data in parsed_data:
                 try:
                     # Coba parsing tanggal menggunakan format yang sesuai
@@ -136,34 +164,10 @@ class WeeklyCoalPriceService:
                     trade_terms=data["tradeTermsColumn"],
                     price=data["priceColumn"]
                 )
-                self.create_weekly_coal_price(weekly_coal_price_request)
-        except KeyError as e:
-            # Tangani jika ada key yang tidak ditemukan di data
-            print(f"KeyError: Kolom yang diperlukan tidak ditemukan - {str(e)}")
-        
+                weekly_coal_price_requests.append(weekly_coal_price_request)
+            return weekly_coal_price_requests
         except Exception as e:
-            # Tangani error lain yang tidak terduga
-            print(f"Terjadi error: {str(e)}")
-    
-    def find_table_header_row_index(self, df: pd.DataFrame, key_header: str) -> int:
-        header_key = key_header.lower()
-        if not header_key:
-            raise ValueError("Table Header tidak ditemukan")
-        
-        def is_similar(s1, s2, threshold=0.8):
-            return SequenceMatcher(None, s1, s2).ratio() >= threshold
-        
-        for index, row in df.iterrows():
-            for item in row.values:
-                if pd.isna(item):
-                    continue
-                
-                # Normalisasi item
-                normalize_item = str(item).lower().strip()
-                if is_similar(normalize_item, header_key):
-                    return index
-        
-        raise ValueError(f"Header dengan key '{header_key}' tidak ditemukan dalam file.")
+            raise e
     
     # def load_config_json_file(self):
     #     config_file_path = "configfile.json"

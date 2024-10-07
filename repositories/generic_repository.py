@@ -1,7 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import Type, Generic, TypeVar, List, Optional
-from database import Base, Base1
-from sqlalchemy.orm import Query
+from typing import Type, Generic, TypeVar, List
 
 T = TypeVar('T')
 
@@ -17,16 +15,48 @@ class GenericRepository(Generic[T]):
         return self.db.query(self.model).filter(self.model.id == id).first()
     
     def create(self, item: T):
-        self.db.add(item)
-        self.db.commit()
-        self.db.refresh(item)
-        return item
+        try:
+            self.db.add(item)
+            self.db.commit()
+            self.db.refresh(item)
+            return True
+        except Exception:
+            self.db.rollback()
+    
+    def bulk_create(self, items: List[T]):
+        try:
+            self.db.bulk_save_objects(items)
+            self.db.commit()
+            return True
+        except Exception as e:
+            print(str(e))
+            self.db.rollback()
+            return False
     
     def update(self, item: T):
-        self.db.commit()
-        self.db.refresh(item)
-        return item
+        try:
+            self.db.commit()
+            self.db.refresh(item)
+            return True
+        except Exception as e:
+            self.db.rollback()
+            return False
+        
+    
+    def bulk_update(self, items: List[T]):
+        try:
+            self.db.bulk_update_mappings(T, [item.to_dict() for item in items])
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            return False
     
     def delete(self, item: T):
-        self.db.delete(item)
-        self.db.commit()
+        try:
+            self.db.delete(item)
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            return False

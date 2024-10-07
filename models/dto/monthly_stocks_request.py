@@ -12,6 +12,8 @@ class MonthlyStocksRequest(BaseModel):
     loc: Optional[str]
     aging: Optional[int]
     sm_b: Optional[str]
+    month: Optional[int]
+    year: Optional[int]
 
     class Config:
         from_attributes = True

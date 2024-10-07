@@ -13,3 +13,5 @@ class MonthlyStocks(Base):
     loc = Column(String, nullable=True)
     aging = Column(Integer, nullable=True)
     sm_b = Column(String, nullable=True)
+    month = Column(Integer, nullable=True)
+    year = Column(Integer, nullable=True)
