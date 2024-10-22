@@ -189,6 +189,7 @@ class MonthlyCoalPriceService:
         df_coal_price = df_coal_price.loc[df_coal_price['coal_price'] >= 0]
         y = df_coal_price['coal_price']
         predicted_values_coal_price = self.forecasting_service.run_sarimax_model(y)
+        predicted_values_coal_price = predicted_values_coal_price.round(2)
         return predicted_values_coal_price
     
     def create_forecast_monthly_coal_price_request(self, predicted_values: pd.Series) -> list[ForecastMonthlyCoalPriceRequest]:
@@ -210,3 +211,6 @@ class MonthlyCoalPriceService:
             for forecast_coal_price_request in list_forecast_coal_price_request
         ]
         return self.forecasting_repo.bulk_create(forecast_coal_prices)
+    
+    def delete_all_monthly_coal_price_service(self) -> bool:
+        return self.forecasting_repo.delete_all()

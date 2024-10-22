@@ -12,7 +12,7 @@ from services.weekly_coal_price_services import WeeklyCoalPriceService
 
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_controllers/token")
 
 def get_db_weekly_coal_price():
     db = SessionLocal()

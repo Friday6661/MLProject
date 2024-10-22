@@ -32,17 +32,21 @@ def get_connection_string(database_config_name):
 # Connection strings
 SQLALCHEMY_DATABASE_URL = URL.create("mssql+pyodbc", query={"odbc_connect": get_connection_string("raw_data")})
 SQLALCHEMY_DATABASE_URL1 = URL.create("mssql+pyodbc", query={"odbc_connect": get_connection_string("clean_data")})
+SQLALCHEMY_DATABASE_URL2 = URL.create("mssql+pyodbc", query={"odbc_connect": get_connection_string("warehouse_data")})
 
 # Create engines
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 engine1 = create_engine(SQLALCHEMY_DATABASE_URL1)
+engine2 = create_engine(SQLALCHEMY_DATABASE_URL2)
 
 # Create session makers
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 SessionLocal1 = sessionmaker(autocommit=False, autoflush=False, bind=engine1)
+SessionLocal2 = sessionmaker(autocommit=False, autoflush=False, bind=engine2)
 
 Base = declarative_base()
 Base1 = declarative_base()
+Base2 = declarative_base()
 
 if not database_exists(SQLALCHEMY_DATABASE_URL):
     create_database(SQLALCHEMY_DATABASE_URL)
@@ -51,3 +55,7 @@ if not database_exists(SQLALCHEMY_DATABASE_URL):
 if not database_exists(SQLALCHEMY_DATABASE_URL1):
     create_database(SQLALCHEMY_DATABASE_URL1)
     print("Database 'CLEAN_DATA' created success")
+
+if not database_exists(SQLALCHEMY_DATABASE_URL2):
+    create_database(SQLALCHEMY_DATABASE_URL2)
+    print("Database 'WAREHOUSE_DATA' created success")

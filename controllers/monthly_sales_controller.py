@@ -13,7 +13,7 @@ from services.monthly_sales_services import MonthlySalesService
 from database import SessionLocal
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_controllers/token")
 def get_db_monthly_sales():
     db = SessionLocal()
     try:
@@ -23,7 +23,7 @@ def get_db_monthly_sales():
 
 # db_dependency = Annotated[Session, Depends(get_db_monthly_sales)]
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_all_monthly_sales(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_sales)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -31,7 +31,7 @@ async def read_all_monthly_sales(token: str = Depends(oauth2_scheme), db: Sessio
     service = MonthlySalesService(db)
     return service.read_all_monthly_sales_service()
 
-@router.get("/{monthly_sales_id}", status_code=status.HTTP_200_OK)
+@router.get("/{monthly_sales_id}", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_monthly_sales_by_id(monthly_sales_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_sales)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -42,7 +42,7 @@ async def read_monthly_sales_by_id(monthly_sales_id: int = Path(gt=0), token: st
         return monthly_sales_service_response
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found("Monthly Sales"))
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def create_monthly_sales(monthly_sales_request: MonthlySalesRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_sales)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -54,7 +54,7 @@ async def create_monthly_sales(monthly_sales_request: MonthlySalesRequest, token
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=ResponseMessageHelper.error_message_create())
     return {"message": ResponseMessageHelper.success_message_create()}
 
-@router.put("/{monthly_sales_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{monthly_sales_id}", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
 async def update_monthly_sales(monthly_sales_id: int, monthly_sales_request: MonthlySalesRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_sales)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -70,7 +70,7 @@ async def update_monthly_sales(monthly_sales_id: int, monthly_sales_request: Mon
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_update())
     return {"message": ResponseMessageHelper.success_message_update()}
     
-@router.delete("/{monthly_sales_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{monthly_sales_id}", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
 async def delete_monthly_sales(monthly_sales_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_sales)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:

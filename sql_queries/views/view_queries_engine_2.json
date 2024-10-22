@@ -1,0 +1,7 @@
+{
+    "views": {
+        "v_linear_regression_with_coef": {
+            "query": "CREATE OR ALTER VIEW V_LINEARREGRESSIONWITHCOEF AS SELECT lr.id, lr.month, lr.total_stocks, lr.total_monthly_working_hours, lr.coal_price, lr.year,\n\n    lr.predicted_sales_Recomendation * (SELECT value FROM [WAREHOUSE_DATA].[dbo].[M_COEFISIENCONFIG] WHERE ml_model = 'LINEAR_REGRESSION' AND method = 'RECOMENDATION') AS predicted_sales_Recomendation_with_coef,\n\n    lr.predicted_sales_Mean * (SELECT value FROM [WAREHOUSE_DATA].[dbo].[M_COEFISIENCONFIG] WHERE ml_model = 'LINEAR_REGRESSION' AND method = 'MEAN') AS predicted_sales_Mean_with_coef,\n\n    lr.predicted_sales_Median * (SELECT value FROM [WAREHOUSE_DATA].[dbo].[M_COEFISIENCONFIG] WHERE ml_model = 'LINEAR_REGRESSION' AND method = 'MEDIAN') AS predicted_sales_Median_with_coef,\n\n    lr.predicted_sales_Mode * (SELECT value FROM [WAREHOUSE_DATA].[dbo].[M_COEFISIENCONFIG] WHERE ml_model = 'LINEAR_REGRESSION' AND method = 'MODE') AS predicted_sales_Mode_with_coef,\n\n    lr.predicted_sales_Min * (SELECT value FROM [WAREHOUSE_DATA].[dbo].[M_COEFISIENCONFIG] WHERE ml_model = 'LINEAR_REGRESSION' AND method = 'MIN') AS predicted_sales_Min_with_coef,\n\n    lr.predicted_sales_Max * (SELECT value FROM [WAREHOUSE_DATA].[dbo].[M_COEFISIENCONFIG] WHERE ml_model = 'LINEAR_REGRESSION' AND method = 'MAX') AS predicted_sales_Max_with_coef\nFROM [WAREHOUSE_DATA].[dbo].[T_LINEARREGRESSIONRESULT] lr;"
+        }
+    }
+}

@@ -15,7 +15,7 @@ from database import SessionLocal
 from database import SessionLocal1
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_controllers/token")
 
 def get_db_komtrax():
     db = SessionLocal()
@@ -33,7 +33,7 @@ def get_db_forecast_working_hours():
 
 # db_dependency = Annotated[Session, Depends(get_db_komtrax)]
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_all_komtrax(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -41,7 +41,7 @@ async def read_all_komtrax(token: str = Depends(oauth2_scheme), db: Session = De
     service = KomtraxService(db)
     return service.read_all_komtrax_service()
 
-@router.get("/{komtrax_id}", status_code=status.HTTP_200_OK)
+@router.get("/{komtrax_id}", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_komtrax_by_id(komtrax_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -52,7 +52,7 @@ async def read_komtrax_by_id(komtrax_id: int = Path(gt=0), token: str = Depends(
         return komtrax_service_response
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found("Komtrax"))
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def create_komtrax(komtrax_request: KomtraxRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -64,7 +64,7 @@ async def create_komtrax(komtrax_request: KomtraxRequest, token: str = Depends(o
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_create())
     return {"message": ResponseMessageHelper.success_message_create()}
 
-@router.put("/{komtrax_id}", status_code=status.HTTP_200_OK)
+@router.put("/{komtrax_id}", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def update_komtrax(komtrax_id: int, komtrax_request: KomtraxRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -80,7 +80,7 @@ async def update_komtrax(komtrax_id: int, komtrax_request: KomtraxRequest, token
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_update())
     return {"message": ResponseMessageHelper.success_message_update()}
     
-@router.delete("/{komtrax_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{komtrax_id}", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def delete_komtrax(komtrax_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -157,8 +157,8 @@ async def read_all_monthly_working_hours(token: str = Depends(oauth2_scheme), db
     service = KomtraxService(db)
     return service.get_data_v_monthly_working_hours()
 
-@router.get("/forecast_monthly_working_hours/", status_code=status.HTTP_200_OK)
-async def forecast_monthly_working_hours(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
+@router.get("/get-forecast-monthly-working-hours/", status_code=status.HTTP_200_OK)
+async def generate_forecast_monthly_working_hours(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_komtrax)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=ResponseMessageHelper.error_message_jwt_authentication())
@@ -168,7 +168,7 @@ async def forecast_monthly_working_hours(token: str = Depends(oauth2_scheme), db
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())
     return forecast_response
 
-@router.get("/save_forecast_monthly_coal_price/", status_code=status.HTTP_201_CREATED)
+@router.post("/save-forecast-monthly-coal-price/", status_code=status.HTTP_201_CREATED)
 async def save_forecast_monthly_working_hours(token: str=Depends(oauth2_scheme), db: Session=Depends(get_db_komtrax), db1: Session=Depends(get_db_forecast_working_hours)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -178,6 +178,9 @@ async def save_forecast_monthly_working_hours(token: str=Depends(oauth2_scheme),
     forecast_response = service.forecast_monthly_working_hours()
     if len(forecast_response) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())
+    delete_all_response = service1.delete_all_monthly_stocks_service()
+    if delete_all_response is False:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_delete())
     create_monthly_working_hours_request = service.create_forecast_monthly_working_hours_request(forecast_response)
     if len(create_monthly_working_hours_request) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())

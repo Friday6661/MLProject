@@ -17,9 +17,7 @@ def get_db_user():
     finally:
         db.close()
 
-db_dependency = Annotated[Session, Depends(get_db_user)]
-
-@router.post("/token", response_model=Token)
+@router.post("/token", response_model=Token, include_in_schema=False)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user_response = await JWTAuthHelper.authenticate_user(form_data.username, form_data.password)
     if not user_response:
@@ -32,6 +30,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = JWTAuthHelper.create_access_token(user_response=user_response)
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/users/me", response_model=User)
-async def read_users_me(current_user: User = Depends(JWTAuthHelper.get_current_user)):
+@router.get("/users/me", response_model=User, include_in_schema=False)
+async def read_users_me(current_user: Annotated[User, Depends(JWTAuthHelper.get_current_active_user)]):
     return current_user

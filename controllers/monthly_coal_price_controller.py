@@ -12,7 +12,7 @@ from models.dto.monthly_coal_price_request import MonthlyCoalPriceRequest
 from services.monthly_coal_price_services import MonthlyCoalPriceService
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_controllers/token")
 
 def get_db_monthly_coal_price():
     db = SessionLocal()
@@ -27,7 +27,7 @@ def get_db_forecast_monthly_coal_price():
     finally:
         db1.close()
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_all_monthly_coal_price(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -35,7 +35,7 @@ async def read_all_monthly_coal_price(token: str = Depends(oauth2_scheme), db: S
     service = MonthlyCoalPriceService(db)
     return service.read_all_monthly_coal_price()
 
-@router.get("/{monthly_coal_price_id}", status_code=status.HTTP_200_OK)
+@router.get("/{monthly_coal_price_id}", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_monthly_coal_price_by_id(monthly_coal_price_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -46,7 +46,7 @@ async def read_monthly_coal_price_by_id(monthly_coal_price_id: int = Path(gt=0),
         return monthly_coal_price_service_response
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found("Monthly Coal Price"))
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def create_monthly_coal_price(monthly_coal_price_request: MonthlyCoalPriceRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -58,7 +58,7 @@ async def create_monthly_coal_price(monthly_coal_price_request: MonthlyCoalPrice
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_create())
     return {"message": ResponseMessageHelper.success_message_create()}
 
-@router.put("/{monthly_coal_price_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{monthly_coal_price_id}", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
 async def update_monthly_coal_price(monthly_coal_price_id: int, monthly_coal_price_request: MonthlyCoalPriceRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -74,7 +74,7 @@ async def update_monthly_coal_price(monthly_coal_price_id: int, monthly_coal_pri
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_update())
     return {"message": ResponseMessageHelper.success_message_update()}
     
-@router.delete("/{monthly_coal_price_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{monthly_coal_price_id}", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
 async def delete_monthly_coal_price(monthly_coal_price_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -150,8 +150,8 @@ async def read_all_monthly_indonesian_coal_price(token: str = Depends(oauth2_sch
     service = MonthlyCoalPriceService(db)
     return service.get_data_v_monthly_coal_price_indonesia()
 
-@router.get("/forecast_monthly_indonesian_coal_price/", status_code=status.HTTP_200_OK)
-async def forecast_monthly_indonesian_coal_price(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
+@router.get("/get-forecast-monthly-indonesian-coal-price/", status_code=status.HTTP_200_OK)
+async def generate_forecast_monthly_indonesian_coal_price(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=ResponseMessageHelper.error_message_jwt_authentication())
@@ -161,7 +161,7 @@ async def forecast_monthly_indonesian_coal_price(token: str = Depends(oauth2_sch
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())
     return forecast_response 
 
-@router.get("/save_forecast_monthly_coal_price/", status_code=status.HTTP_201_CREATED)
+@router.post("/save-forecast-monthly-coal-price/", status_code=status.HTTP_201_CREATED)
 async def save_forecast_monthly_coal_price(token: str=Depends(oauth2_scheme), db: Session=Depends(get_db_monthly_coal_price), db1: Session=Depends(get_db_forecast_monthly_coal_price)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -171,6 +171,9 @@ async def save_forecast_monthly_coal_price(token: str=Depends(oauth2_scheme), db
     forecast_response = service.forecast_monthly_coal_price_indonesia()
     if len(forecast_response) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())
+    delete_all_response = service1.delete_all_monthly_coal_price_service()
+    if delete_all_response is False:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_delete())
     create_monthly_coal_price_request = service.create_forecast_monthly_coal_price_request(forecast_response)
     if len(create_monthly_coal_price_request) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())

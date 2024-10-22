@@ -122,6 +122,7 @@ class MonthlyStocksService:
         df_monthly_stocks = self.forecasting_service.create_dataframe_from_list(monthly_stocks_list, 'month')
         y = df_monthly_stocks['total_stocks']
         predicted_values_monthly_stocks = self.forecasting_service.run_sarimax_model(y)
+        predicted_values_monthly_stocks = predicted_values_monthly_stocks.round(0)
         return predicted_values_monthly_stocks
     
     def create_forecast_monthly_stocks_request(self, predicted_values: pd.Series) -> list[ForecastTotalMonthlyStocksRequest]:
@@ -143,3 +144,6 @@ class MonthlyStocksService:
             for forecast_monthly_stocks_request in list_forecast_monthly_stocks_request
         ]
         return self.forecasting_repo.bulk_create(forecast_total_monthly_stocks)
+    
+    def delete_all_monthly_stocks_service(self) ->  bool:
+        return self.forecasting_repo.delete_all()

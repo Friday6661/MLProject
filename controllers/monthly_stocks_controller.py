@@ -13,7 +13,7 @@ from services.monthly_stocks_services import MonthlyStocksService
 from database import SessionLocal, SessionLocal1
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_controllers/token")
 def get_db_monthly_stocks():
     db = SessionLocal()
     try:
@@ -30,7 +30,7 @@ def get_db_forecast_monthly_stocks():
 
 # db_dependency = Annotated[Session, Depends(get_db_monthly_stocks)]
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_all_monthly_stocks(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -38,7 +38,7 @@ async def read_all_monthly_stocks(token: str = Depends(oauth2_scheme), db: Sessi
     service = MonthlyStocksService(db)
     return service.read_all_monthly_stocks_service()
 
-@router.get("/{monthly_stocks_id}", status_code=status.HTTP_200_OK)
+@router.get("/{monthly_stocks_id}", status_code=status.HTTP_200_OK, include_in_schema=False)
 async def read_monthly_stocks_by_id(monthly_stocks_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -50,7 +50,7 @@ async def read_monthly_stocks_by_id(monthly_stocks_id: int = Path(gt=0), token: 
         return monthly_stocks_service_response
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found("Monthly Stocks"))
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def create_monthly_stocks(monthly_stocks_request: MonthlyStocksRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -62,7 +62,7 @@ async def create_monthly_stocks(monthly_stocks_request: MonthlyStocksRequest, to
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_create())
     return {"message": ResponseMessageHelper.success_message_create()}
 
-@router.put("/{monthly_stocks_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{monthly_stocks_id}", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
 async def update_monthly_stocks(monthly_stocks_id: int, monthly_stocks_request: MonthlyStocksRequest, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -78,7 +78,7 @@ async def update_monthly_stocks(monthly_stocks_id: int, monthly_stocks_request: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_update())
     return {"message": ResponseMessageHelper.success_message_update()}
 
-@router.delete("/{monthly_stocks_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{monthly_stocks_id}", status_code=status.HTTP_204_NO_CONTENT, include_in_schema=False)
 async def delete_monthly_stocks(monthly_stocks_id: int = Path(gt=0), token: str = Depends(oauth2_scheme), db: Session = Depends(get_db_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -111,7 +111,7 @@ async def upload_excel_file(file: UploadFile = File(...), token: str = Depends(o
         create_response = service.bulk_create_monthly_stock_service(parsing_response)
         if create_response is False:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_create())
-        return {"message": ResponseMessageHelper.success_message_create()}
+        return {"message": ResponseMessageHelper.success_message_upload_file()}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
@@ -142,7 +142,7 @@ async def bulk_upload_excel_file(
         create_response = service.bulk_create_monthly_stock_service(list_monthly_stocks_requests)
         if create_response is False:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_create())
-        return {"message": ResponseMessageHelper.success_message_create()}
+        return {"message": ResponseMessageHelper.success_message_upload_file()}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
@@ -154,8 +154,8 @@ async def read_all_total_monthly_stocks(token: str = Depends(oauth2_scheme), db:
     service = MonthlyStocksService(db)
     return service.get_data_v_monthly_stocks()
 
-@router.get("/forecast_monthly_stocks/", status_code=status.HTTP_200_OK)
-async def forecast_monthly_stocks(token: str=Depends(oauth2_scheme), db: Session=Depends(get_db_monthly_stocks)):
+@router.get("/get-forecast-monthly-stocks/", status_code=status.HTTP_200_OK)
+async def generate_forecast_monthly_stocks(token: str=Depends(oauth2_scheme), db: Session=Depends(get_db_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=ResponseMessageHelper.error_message_jwt_authentication())
@@ -165,7 +165,7 @@ async def forecast_monthly_stocks(token: str=Depends(oauth2_scheme), db: Session
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())
     return forecast_response
 
-@router.post("/save_forecast_monthly_stocks/", status_code=status.HTTP_201_CREATED)
+@router.post("/save-forecast-monthly-stocks/", status_code=status.HTTP_201_CREATED)
 async def save_forecast_monthly_stocks(token: str=Depends(oauth2_scheme), db: Session=Depends(get_db_monthly_stocks), db1: Session=Depends(get_db_forecast_monthly_stocks)):
     current_user = JWTAuthHelper.get_current_user(token)
     if current_user is None:
@@ -175,6 +175,9 @@ async def save_forecast_monthly_stocks(token: str=Depends(oauth2_scheme), db: Se
     forecast_response = service.forecast_monthly_stocks()
     if len(forecast_response) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())
+    delete_all_response = service1.delete_all_monthly_stocks_service()
+    if delete_all_response is False:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ResponseMessageHelper.error_message_delete())
     create_request_response = service.create_forecast_monthly_stocks_request(forecast_response)
     if len(create_request_response) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ResponseMessageHelper.error_message_data_not_found())

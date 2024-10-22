@@ -6,3 +6,13 @@ from repositories.generic_repository import GenericRepository
 class ForecastMonthlyWorkingHoursRepository(GenericRepository[ForecastMontlyWorkingHours]):
     def __init__(self, db: Session):
         super().__init__(db, ForecastMontlyWorkingHours)
+
+    def delete_all(self) -> bool:
+        try:
+            self.db.query(ForecastMontlyWorkingHours).delete()
+            self.db.commit()
+            return True
+        except Exception as e:
+            self.db.rollback()
+            print(str(e))
+            return False

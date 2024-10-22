@@ -29,7 +29,8 @@ class ForecastingTimeSeriesService:
     def create_dataframe_from_list(self, list_data: list, index_column: str) -> pd.DataFrame:
         df = pd.DataFrame(list_data)
         df.rename(columns={index_column: 'month'}, inplace=True)
-        df['month'] = pd.to_datetime(df['month'], format='%Y-%m')
+        # df['month'] = pd.to_datetime(df['month'], format='%Y-%m')
+        df['month'] = pd.to_datetime(df['month'], format='%Y-%m', errors='coerce')
         df.set_index('month', inplace=True)
         df = df.sort_index().asfreq('MS')
         return df

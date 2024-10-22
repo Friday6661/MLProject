@@ -11,9 +11,11 @@ venv/
 env/
 ENV/
 *.env
+envproject/
 
 # IDEs and editors
 .vscode/
+.vs
 .idea/
 *.suo
 *.ntvs_analysis.dat
@@ -46,6 +48,9 @@ docker-compose.yml
 .DS_Store
 *.swp
 *.swo
+
+# Ignore model files if large or unnecessary
+*.pkl
 
 # Other
 *.egg

@@ -17,7 +17,6 @@ from models.dto.komtrax_request import KomtraxRequest
 from models.dto.forecast_monthly_working_hours_request import ForecastMonthlyWorkingHoursRequest
 from sqlalchemy.orm import Session
 
-from services.filling_missing_value_services import FillingMissingValue
 from services.general_parshing_services import GeneralParshing
 from services.forecasting_time_series_services import ForecastingTimeSeriesService
 
@@ -155,6 +154,7 @@ class KomtraxService:
         df_monthly_working_hours = self.forecasting_service.create_dataframe_from_list(monthly_working_hours_list, 'month')
         y = df_monthly_working_hours['total_monthly_working_hours']
         predicted_values_monthly_working_hours = self.forecasting_service.run_sarimax_model(y)
+        predicted_values_monthly_working_hours = predicted_values_monthly_working_hours.round(2)
         return predicted_values_monthly_working_hours
     
     def create_forecast_monthly_working_hours_request(self, predicted_values: pd.Series) -> list[ForecastMonthlyWorkingHoursRequest]:
@@ -176,3 +176,6 @@ class KomtraxService:
             for forecast_working_hours_request in list_forecast_monthly_working_hours_request
         ]
         return self.forecasting_repo.bulk_create(forecast_working_hours)
+    
+    def delete_all_monthly_stocks_service(self) -> bool:
+        return self.forecasting_repo.delete_all()

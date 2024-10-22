@@ -1,13 +1,14 @@
 import json
 from datetime import datetime, timedelta, timezone
-from typing  import Optional, Union
+from typing  import Annotated, Optional, Union
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 import httpx
-from jwt import PyJWTError
+from jwt import InvalidTokenError, PyJWTError
 import jwt
 from helper.json_helper import JsonHelper
 from passlib.context import CryptContext
+from starlette import status
 
 from models.user_model import User
 
@@ -24,6 +25,93 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class JWTAuthHelper:
+
+    # @staticmethod
+    # async def authenticate_user(email: str, password: str):
+    #     url = ess_user["url"]
+    #     device_id = ess_user["device_id"]
+
+    #     payload = {
+    #         "email": email,
+    #         "password": password,
+    #         "DeviceId": device_id
+    #     }
+
+    #     async with httpx.AsyncClient() as client:
+    #         response = await client.post(url, data = payload)
+    #         if response.status_code != 200:
+    #             raise HTTPException(status_code=response.status_code, detail="Invalid ess user")
+            
+    #         user_response = response.json()
+    #         return user_response
+        
+    # @staticmethod
+    # async def verify_token(token: str):
+    #     try:
+    #         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
+    #         return payload
+    #     except InvalidTokenError as e:
+    #         raise HTTPException(
+    #             status_code=401,
+    #             detail="Could not validate credentials",
+    #             headers={"WWW-Authenticate": "Bearer"},
+    #         )
+
+    
+    # def create_access_token(user_response: dict, expires_delta: Union[timedelta, None] = None):
+    #     user_data = user_response["data"]
+    #     to_encode = {
+    #         "id": user_data["Id"],
+    #         "email": user_data["Email"],
+    #         "nrp": user_data["NRP"],
+    #         "first_name": user_data["FirstName"],
+    #         "middle_name": user_data["MiddleName"],
+    #         "last_name": user_data["LastName"],
+    #         "full_name": user_data["FullName"],
+    #         "address": user_data["Address"],
+    #         "phone": user_data["Phone"],
+    #         "working_location_id": user_data["WorkingLocationId"],
+    #         "role_id": user_data["RoleId"],
+    #         "disabled": False
+    #     }
+    #     if expires_delta:
+    #         expire = datetime.now(timezone.utc) + expires_delta
+    #     else:
+    #         expire = datetime.now(timezone.utc) + timedelta(hours=6)
+    #     to_encode.update({"exp": expire})
+    #     encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
+    #     return encoded_jwt
+    
+    # @staticmethod
+    # async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    #     payload = await JWTAuthHelper.verify_token(token)
+
+    #     username: str = payload.get("nrp")
+    #     if username is None:
+    #         raise HTTPException(
+    #             status_code=401,
+    #             detail="Could not validate credentials",
+    #             headers={"WWW-Authenticate": "Bearer"},
+    #         )
+        
+    #     user = User(
+    #         username = payload.get("nrp"),
+    #         email = payload.get("email"),
+    #         full_name = payload.get("full_name"),
+    #         disabled = payload.get("disabled", False)
+    #     )
+
+    #     if user.disabled:
+    #         raise HTTPException(status_code=400, detail="Inactive user")
+    #     return user
+    
+    # @staticmethod
+    # async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
+    #     if current_user.disabled:
+    #         raise HTTPException(status_code=400, detail="Inactive user")
+    #     return current_user
+    
+
 
     @staticmethod
     async def authenticate_user(email: str, password: str):
@@ -57,7 +145,8 @@ class JWTAuthHelper:
             "address": user_data["Address"],
             "phone": user_data["Phone"],
             "working_location_id": user_data["WorkingLocationId"],
-            "role_id": user_data["RoleId"]
+            "role_id": user_data["RoleId"],
+            "disabled": False
         }
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
@@ -84,7 +173,7 @@ class JWTAuthHelper:
             raise credentials_exception
         
     @staticmethod
-    def get_current_user(token: str = Depends(oauth2_scheme)):
+    def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         payload = JWTAuthHelper.verify_token(token)
 
         username: str = payload.get("nrp")
@@ -105,4 +194,9 @@ class JWTAuthHelper:
         if user.disabled:
             raise HTTPException(status_code=400, detail="Inactive user")
         return user
-
+    
+    @staticmethod
+    def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
+        if current_user.disabled:
+            raise HTTPException(status_code=400, detail="Inactive user")
+        return current_user
